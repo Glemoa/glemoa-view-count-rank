@@ -1,0 +1,31 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      # 유레카 서버가 어디에 있는지를 위치 정보를 여기다가 명시해 둔 것이다.
+      defaultZone: http://${EUREKA_SERVER_URL}:8761/eureka/
+
+server:
+  port: 8080
+
+spring:
+  # Redis 설정 추가 (로컬 설정을 기반으로 환경 변수화)
+  data:
+    redis:
+      host: ${REDIS_HOST} # Redis 서버 주소 (환경 변수)
+      port: ${REDIS_PORT} # Redis 포트 (환경 변수)
+  datasource:
+    # MySQL 드라이버 지정
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 도커 컨테이너로 3306 포트로 접속할 수 있도록 띄어놓은 db와 연결
+    URL: jdbc:mysql://${DB_HOST}:3306/Glemoa
+    username: ${DB_USERNAME} # 환경 변수로 변경
+    password: ${DB_PASSWORD} # 환경 변수로 변경
+  jpa:
+    # 데이터 베이스 플랫폼에는 MySQL DB를 사용할 것이기 때문에 이렇게 설정
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: create

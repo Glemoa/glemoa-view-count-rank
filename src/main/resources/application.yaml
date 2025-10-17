@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: glemoa-view-count-rank
+  profiles:
+    active: local
