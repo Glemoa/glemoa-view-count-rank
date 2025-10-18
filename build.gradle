@@ -39,6 +39,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //	msa간의 통신을 하기 위한 openfeign 의존성 추가
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 
 dependencyManagement {
@@ -49,4 +52,13 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+// 빌드 될 떄 '0.0.1-SNAPSHOT' << 이거 안붙이게 함.
+tasks.withType(org.springframework.boot.gradle.tasks.bundling.BootJar) {
+    archiveVersion.set('')
 }
