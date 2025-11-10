@@ -91,7 +91,7 @@ jobs:
             pkill -f "$JAR_NAME" || true
             sleep 5
 
-            nohup java -jar \
+            nohup java -Xmx384m -jar \
               -Dspring.profiles.active=prod \
               \
               -Dserver.port=$APP_PORT \
