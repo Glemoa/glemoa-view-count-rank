@@ -8,6 +8,11 @@ eureka:
 
 server:
   port: 8080
+  tomcat:
+    # 최대 스레드 개수를 10개 이내로 제한 (기본값 200)
+    max-threads: 10
+    # 최소 스레드 개수를 1~2개로 제한
+    min-spare-threads: 2
 
 spring:
   # Redis 설정 추가 (로컬 설정을 기반으로 환경 변수화)
@@ -22,6 +27,11 @@ spring:
     URL: jdbc:mysql://${DB_HOST}:3306/Glemoa
     username: ${DB_USERNAME} # 환경 변수로 변경
     password: ${DB_PASSWORD} # 환경 변수로 변경
+    hikari:
+      # 최대 커넥션 개수를 5개 이내로 제한 (기본값 10)
+      maximum-pool-size: 5
+      # 최소 유휴 커넥션 개수를 2개 이내로 제한
+      minimum-idle: 2
   jpa:
     # 데이터 베이스 플랫폼에는 MySQL DB를 사용할 것이기 때문에 이렇게 설정
     database-platform: org.hibernate.dialect.MySQLDialect
