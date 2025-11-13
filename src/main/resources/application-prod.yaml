@@ -10,7 +10,7 @@ server:
   port: 8080
   tomcat:
     # 최대 스레드 개수를 10개 이내로 제한 (기본값 200)
-    max-threads: 10
+    max-threads: 5
     # 최소 스레드 개수를 1~2개로 제한
     min-spare-threads: 2
 
@@ -36,14 +36,14 @@ spring:
     # 데이터 베이스 플랫폼에는 MySQL DB를 사용할 것이기 때문에 이렇게 설정
     database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: false
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
 
 logging:
   config: classpath:logback-prod.xml
   level:
     # 1. 모든 외부 라이브러리 및 기본 동작은 INFO 레벨로 설정
-    root: INFO
-    # 2. Glemoa Reader 서비스의 핵심 로직만 DEBUG 레벨로 설정
-    hyunsub.glemoaviewcountrank: DEBUG
+    root: WARN
+    # 2. Glemoa Reader 서비스의 핵심 로직만 INFO 레벨로 설정
+    hyunsub.glemoaviewcountrank: INFO

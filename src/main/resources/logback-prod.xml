@@ -19,7 +19,7 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_FILE_PATH}/backup/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.gz</fileNamePattern>
-            <maxHistory>30</maxHistory>
+            <maxHistory>7</maxHistory>
         </rollingPolicy>
 
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
