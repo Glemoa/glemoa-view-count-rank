@@ -10,7 +10,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ViewCountDbRepository extends JpaRepository<PostViewCount, Long> {
     @Query(
-            value = "update post_view_count set view_count = :viewCount " +
+            value = "update post_view_count " +
+                    "set view_count = :viewCount " +
                     "where post_id = :postId and view_count < :viewCount",
             nativeQuery = true
     )
@@ -18,5 +19,17 @@ public interface ViewCountDbRepository extends JpaRepository<PostViewCount, Long
     int updateViewCount(
             @Param("postId") Long postId,
             @Param("viewCount") Long viewCount
+    );
+
+    @Modifying
+    @Query(
+            value = "INSERT INTO post_view_count (post_id, view_count) " +
+                    "VALUES (:postId, :dailyCount) " +
+                    "ON DUPLICATE KEY UPDATE view_count = view_count + :dailyCount",
+            nativeQuery = true
+    )
+    void addViewCount(
+            @Param("postId") Long postId,
+            @Param("dailyCount") Long dailyCount
     );
 }

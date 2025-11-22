@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,45 +29,42 @@ public class ViewCountService {
         this.readerFeign = readerFeign;
     }
 
-    public Long increase(Long postId) {
-        Long count = viewCountRedisRepository.increase(postId);
+    public void increase(Long postId) {
+        Long count = viewCountRedisRepository.redisIncrease(postId, LocalDate.now());
 
         if(count % BACK_UP_BATCH_SIZE == 0) {
             viewCountDbBackUpService.backUp(postId, count);
         }
-
-        return count;
     }
 
     public Long count(Long postId) {
-        return viewCountRedisRepository.count(postId);
+        return viewCountRedisRepository.redisCount(postId, LocalDate.now());
     }
 
     public List<RankedPostDto> getDailyRank(long start, long end) {
-        Set<TypedTuple<String>> dailyRank = viewCountRedisRepository.getDailyRank(start, end);
+        Set<TypedTuple<String>> dailyRank = viewCountRedisRepository.redisGetDailyRank(start, end, LocalDate.now());
         List<Long> rankedPostIds = new ArrayList<>();
 
-        for(TypedTuple<String> tuple : dailyRank) {
-            Long postIdNumber = null;
-            String postId = tuple.getValue();
-            Long viewCount = tuple.getScore().longValue();
-
-            // "::"를 기준으로 문자열을 분리합니다.
-            String[] parts = postId.split("::");
-
-            // 배열의 두 번째 요소 (인덱스 1)가 숫자 부분입니다.
-            if (parts.length > 1) {
-                postIdNumber = Long.parseLong(parts[1]); // 결과: "1", "2" 등
-                rankedPostIds.add(postIdNumber);
-            } else {
-                // 구분자가 없는 경우 처리 로직 (선택 사항)
-                log.info("Invalid format: " + postId);
-            }
-            log.info("게시글 번호 : " + postIdNumber + " / 조회수 : " + viewCount);
+        // 일간 순위가 없다면 비어 있는 채로 반환
+        if(dailyRank.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        List<RankedPostDto> rankedPostDtos = readerFeign.viewBookMarkedPostByPostIdList(rankedPostIds);
+        for(TypedTuple<String> tuple : dailyRank) {
+            String postId = tuple.getValue();
+            Long viewCount = tuple.getScore() != null ? tuple.getScore().longValue() : 0L;
 
-        return rankedPostDtos;
+            // postId::302837 형식의 key를 id만 추출
+            Long postIdNumber = viewCountRedisRepository.parsePostId(postId);
+
+            if (postIdNumber != null) {
+                rankedPostIds.add(postIdNumber);
+                log.info("게시글 번호 : " + postIdNumber + " / 조회수 : " + viewCount);
+            } else {
+                log.warn("Invalid format or failed to parse: " + postId);
+            }
+        }
+
+        return readerFeign.viewBookMarkedPostByPostIdList(rankedPostIds);
     }
 }

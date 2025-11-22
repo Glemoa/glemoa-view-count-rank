@@ -21,8 +21,8 @@ public class PostViewCountController {
 
     // 조회수 1 증가 API
     @PostMapping("/views/{postId}")
-    public Long increaseViewCount(@PathVariable Long postId) {
-        return viewCountService.increase(postId);
+    public void increaseViewCount(@PathVariable Long postId) {
+        viewCountService.increase(postId);
     }
 
     // 특정 게시물 조회수 조회 API

@@ -15,9 +15,6 @@ public class ViewCountDbBackUpService {
     }
 
     public void backUp(Long postId, Long viewCount) {
-        viewCountDbRepository.save(PostViewCount.builder()
-                .postId(postId)
-                .viewCount(viewCount)
-                .build());
+        viewCountDbRepository.addViewCount(postId, viewCount);
     }
 }
